@@ -1,0 +1,96 @@
+package ma.pam.ajitsowak.woolib.models
+
+import com.google.gson.annotations.SerializedName
+import java.io.Serializable
+import java.util.ArrayList
+import java.util.Date
+
+
+class Product : Serializable {
+
+    var id: Int = 0
+    var name: String=""
+    var slug: String? = null
+    var permalink: String? = null
+    var type: String? = null
+    lateinit var status: String  // publish or not
+    @SerializedName("featured")
+    var isFeatured: Boolean = false
+
+    lateinit var catalog_visibility: String
+    lateinit var description: String
+    lateinit var short_description: String
+    lateinit var sku: String
+    lateinit var price: String
+    lateinit var regular_price: String
+    lateinit var sale_price: String
+    var date_on_sale_from: Date? = null
+    lateinit var date_on_sale_from_gmt: Date
+    var date_on_sale_to: Date? = null
+    lateinit var date_on_sale_to_gmt: Date
+    lateinit var price_html: String
+    @SerializedName("on_sale")
+    var isOn_sale: Boolean = false
+    @SerializedName("purchasable")
+    var isPurchasable: Boolean = false
+    var total_sales: Int = 0
+    var isVirtual: Boolean = false
+    var isDownloadable: Boolean = false
+    lateinit var downloads: ArrayList<Download>
+    var download_limit: Int = 0
+    var download_expiry: Int = 0
+
+    lateinit var external_url: String
+    lateinit var button_text: String
+    lateinit var tax_status: String
+    lateinit var tax_class: String
+    var isManage_stock: Boolean = false
+    var stock_quantity: Int = 0
+
+    var stock_status:String = "" // instock
+    lateinit var backorders: String
+    var isBackorders_allowed: Boolean = false
+    var isBackordered: Boolean = false
+    var isSold_individually: Boolean = false
+    lateinit var weight: String
+    lateinit var dimensions: Any
+    var isShipping_required: Boolean = false
+    var isShipping_taxable: Boolean = false
+    lateinit var shipping_class: String
+    var shipping_class_id: Int = 0
+
+    @SerializedName("reviews_allowed")
+    var isReviews_allowed: Boolean = false
+
+    var average_rating: String = ""
+    var rating_count: Int = 0
+    lateinit var related_ids: ArrayList<Int>
+    lateinit var upsell_ids: ArrayList<Int>
+    lateinit var cross_sell_ids: ArrayList<Int>
+    var parent_id: Int = 0
+    lateinit var purchase_note: String
+    lateinit var categories: ArrayList<Category>
+    lateinit var tags: ArrayList<Tag>
+
+    @SerializedName("attributes")
+    lateinit var productAttributes: ArrayList<ProductAttribute>
+
+    lateinit var default_attributes: ArrayList<DefaultAttribute>
+
+    lateinit var variations: ArrayList<Int>
+
+    lateinit var grouped_products: ArrayList<Int>
+
+    var menu_order: Int = 0
+    lateinit var meta_data: ArrayList<Metadata>
+    lateinit var images: ArrayList<Image>
+
+    fun getFeatureImage(): String{
+        if(this.images.isEmpty()){
+            return ""
+        }
+
+        return this.images.first().src!!
+    }
+}
+
