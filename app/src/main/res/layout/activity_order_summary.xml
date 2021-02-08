@@ -57,7 +57,9 @@
                     android:textColor="@color/textColorSecondary"
                     android:text="Method Applied"
                     android:visibility="gone"
-                    android:layout_marginTop="@dimen/spacing_middle" />
+                    android:layout_marginTop="@dimen/spacing_middle"
+                    android:textStyle="bold"
+                    />
 
                 <TextView
                     android:id="@+id/tvMethodName"

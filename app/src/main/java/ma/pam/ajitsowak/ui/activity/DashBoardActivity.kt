@@ -23,7 +23,7 @@ import ma.pam.ajitsowak.ui.fragment.HomeFragment1
 import ma.pam.ajitsowak.utils.*
 
 
-class DashBoardActivity : AppCompatActivity() {
+class DashBoardActivity : mAppCompatActivity() {
 
     private lateinit var mHomeFragment: Fragment
   //  private val mWishListFragment = WishListFragment()
@@ -96,19 +96,10 @@ class DashBoardActivity : AppCompatActivity() {
         }
         tvAbout.setOnClickListener {
 
-            showProgress(true)
-            Handler(Looper.getMainLooper()).postDelayed({
-                showProgress(false)
-            },3000)
-
-
-
-
 
            // startActivity(Intent(this@DashBoardActivity,AboutActivity::class.java))
             closeDrawer()
         }
-
 
     }
 

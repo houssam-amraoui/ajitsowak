@@ -59,7 +59,6 @@ import java.util.*
 
 fun getUserId(): String = getSharedPrefInstance().getStringValue(USER_ID)
 fun getDefaultCurrency(): String = getSharedPrefInstance().getStringValue(DEFAULT_CURRENCY)
-fun getDefaultCurrencyFormate(): String = getSharedPrefInstance().getStringValue(DEFAULT_CURRENCY_FORMATE)
 fun getLanguage(): String = getSharedPrefInstance().getStringValue(LANGUAGE)
 fun getDisplayName(): String = getSharedPrefInstance().getStringValue(USER_DISPLAY_NAME)
 fun getLastName(): String = getSharedPrefInstance().getStringValue(USER_LAST_NAME)
@@ -75,8 +74,6 @@ fun getButtonColor(): String { return getSharedPrefInstance().getStringValue(PRI
 fun getTextPrimaryColor(): String { return getSharedPrefInstance().getStringValue(TEXTPRIMARYCOLOR) }
 fun getTextSecondaryColor(): String { return getSharedPrefInstance().getStringValue(TEXTSECONDARYCOLOR) }
 fun getBackgroundColor(): String { return getSharedPrefInstance().getStringValue(BACKGROUNDCOLOR) }
-fun getProductDetailConstant(): Int = getSharedPrefInstance().getIntValue(KEY_PRODUCT_DETAIL, 0)
-fun getProfile(): String = getSharedPrefInstance().getStringValue(USER_PROFILE)
 
 
 fun convertOrderDataToLocalDate(ourDate: Date?): String? {
@@ -140,21 +137,13 @@ fun Context.fontRegular(): Typeface? {
     return Typeface.createFromAsset(assets, getString(R.string.font_regular))
 }
 
-fun Activity.getAlertDialog(
-    aMsgText: String,
-    aTitleText: String = getString(R.string.lbl_dialog_title),
-    aPositiveText: String = getString(R.string.lbl_yes),
-    aNegativeText: String = getString(R.string.lbl_no),
-    onPositiveClick: (dialog: DialogInterface, Int) -> Unit,
-    onNegativeClick: (dialog: DialogInterface, Int) -> Unit
-): AlertDialog {
+fun Activity.getAlertDialog(aMsgText: String, aTitleText: String = getString(R.string.lbl_dialog_title), aPositiveText: String = getString(R.string.lbl_yes), aNegativeText: String = getString(R.string.lbl_no), onPositiveClick: (dialog: DialogInterface, Int) -> Unit, onNegativeClick: (dialog: DialogInterface, Int) -> Unit): AlertDialog {
     val builder = AlertDialog.Builder(this)
     builder.setTitle(aTitleText)
     builder.setMessage(aMsgText)
     builder.setPositiveButton(aPositiveText) { dialog, which ->
         onPositiveClick(dialog, which)
     }
-
     builder.setNegativeButton(aNegativeText) { dialog, which ->
         onNegativeClick(dialog, which)
     }

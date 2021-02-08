@@ -8,10 +8,10 @@ import ma.pam.ajitsowak.R
 import ma.pam.ajitsowak.ui.fragment.ViewAllProductFragment
 import ma.pam.ajitsowak.utils.Constants
 import ma.pam.ajitsowak.utils.addFragment
-import ma.pam.ajitsowak.utils.setToolbar
+import ma.pam.ajitsowak.utils.setDetailToolbar
 
 
-class ViewAllProductActivity : AppCompatActivity() {
+class ViewAllProductActivity : mAppCompatActivity() {
 
     private var mFragment: ViewAllProductFragment? = null
     private lateinit var toolbar:Toolbar
@@ -20,10 +20,7 @@ class ViewAllProductActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_all)
         toolbar = findViewById(R.id.toolbar)
-        setToolbar(toolbar)
-        toolbar.setNavigationOnClickListener {
-            onBackPressed()
-        }
+        setDetailToolbar(toolbar)
 
         title = intent.getStringExtra(Constants.KeyIntent.TITLE)
         val mViewAllId = intent.getIntExtra(Constants.KeyIntent.VIEWALLID, 0) // type

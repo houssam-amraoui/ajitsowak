@@ -17,7 +17,7 @@ import ma.pam.ajitsowak.R
 import ma.pam.ajitsowak.utils.Constants
 import ma.pam.ajitsowak.utils.setDetailToolbar
 
-class WebViewActivity : AppCompatActivity() {
+class WebViewActivity : mAppCompatActivity() {
     var mIsError = false
     private var mWebViewClient = WebViewClient()
     private var webChromeClient = WebChromeClient()
@@ -44,6 +44,7 @@ class WebViewActivity : AppCompatActivity() {
     }
 
     private fun setupWebView() {
+       // showProgress(true)
         configureWebView()
         configureWebClient()
         initChromeClient()
@@ -98,6 +99,7 @@ class WebViewActivity : AppCompatActivity() {
         mWebViewClient = object : WebViewClient() {
             override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
                 super.onPageStarted(view, url, favicon)
+                showProgress(true)
             }
 
             override fun onPageFinished(view: WebView, url: String) {
@@ -105,10 +107,12 @@ class WebViewActivity : AppCompatActivity() {
                 super.onPageFinished(view, url)
                 if (!mIsError) {
                     if (url.contains("checkout/order-received")) {
+                        showProgress(false)
                         setResult(Activity.RESULT_OK)
                         Toast.makeText(this@WebViewActivity, "Order placed successfully", Toast.LENGTH_LONG).show()
                         finish()
                     } else {
+                        showProgress(false)
                     }
                 }
             }

@@ -383,8 +383,8 @@
                 android:id="@+id/tvAllReviews"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/spacing_standard_new"
                 android:layout_marginStart="@dimen/spacing_standard_new"
+                android:layout_marginTop="@dimen/spacing_standard_new"
                 android:layout_marginEnd="@dimen/spacing_standard_new"
                 android:layout_marginBottom="@dimen/spacing_xxlarge"
                 android:background="@drawable/bg_ractangal_stroked"
@@ -456,7 +456,8 @@
             android:layout_weight="1"
             android:text="@string/lbl_add_to_cart"
             app:cornerRadius="@dimen/spacing_control"
-            app:backgroundTint="@color/colorAccent"/>
+            app:backgroundTint="@color/colorAccent"
+            />
 
     </LinearLayout>
 

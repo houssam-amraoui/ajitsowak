@@ -3,12 +3,18 @@ package ma.pam.ajitsowak.ui.activity
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.ColorFilter
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,6 +30,7 @@ import ma.pam.ajitsowak.adapter.SpinnerAdapter
 import ma.pam.ajitsowak.MyApp.getRoom
 import ma.pam.ajitsowak.MyApp.getWooApi
 import ma.pam.ajitsowak.R
+import ma.pam.ajitsowak.room.CartItem
 import ma.pam.ajitsowak.room.FavModel
 import ma.pam.ajitsowak.utils.*
 import ma.pam.ajitsowak.utils.Constants.KeyIntent.DATA
@@ -43,16 +50,18 @@ import kotlin.collections.ArrayList
 import kotlin.math.abs
 
 @SuppressLint("SetTextI18n")
-class ProductDetailActivity1 : AppCompatActivity() {
+class ProductDetailActivity1 : mAppCompatActivity() {
     private var mProductId = 0
     private val mImages = ArrayList<String>()
-    private lateinit var mMenuCart: View
+    private var mMenuCart: View? = null
     private var mIsInWishList = false
+    private var isAddedToCart: Boolean = false
     private var mIsExternalProduct = false
     private var mExternalURL: String = ""
     private var mAttributeAdapter: BaseAdapter<String>? = null
     private var mYearAdapter: ArrayAdapter<String>? = null
     private var image: String = ""
+    private var count: Int = 0
 
 
     lateinit var toolbar:Toolbar
@@ -69,6 +78,8 @@ class ProductDetailActivity1 : AppCompatActivity() {
     lateinit var tvItemProductRating:RatingBar
     lateinit var tvTags:TextView
     lateinit var btnOutOfStock:MaterialButton
+
+    lateinit var product:Product
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -92,15 +103,12 @@ class ProductDetailActivity1 : AppCompatActivity() {
         setDetailToolbar(toolbar)
         //changeColor()
 
-
-        if (intent?.extras?.get(DATA) == null && intent?.extras?.get(PRODUCT_ID) == null) {
+        if (intent?.extras?.containsKey(PRODUCT_ID) == false) {
             Toast.makeText(this,getString(R.string.error_something_went_wrong),Toast.LENGTH_SHORT).show()
             finish()
             return
         }
-
         mProductId = intent?.getIntExtra(PRODUCT_ID, 0)!!
-        val product = intent?.extras?.getSerializable(DATA) as Product
 
 
         rvLike.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
@@ -111,34 +119,47 @@ class ProductDetailActivity1 : AppCompatActivity() {
             setHasFixedSize(true)
             adapter = mCategoryAdapter
         }
-
-
         scrollView.visibility = View.GONE
 
-        getProductDetail(product)
-       /* if (isNetworkAvailable()) {
-            getWooApi().getProductDetail(mProductId).enqueue(object : Callback<Product> {
-                override fun onFailure(call: Call<Product>, t: Throwable) {}
-                override fun onResponse(call: Call<Product>, response: Response<Product>) {
-                    getProductDetail(response.body()!!)
-                }
-            });
-        }*/
+        if (intent?.extras?.containsKey(DATA) == true) {
+            product = intent?.extras?.getSerializable(DATA) as Product
+            getProductDetail(product)
+            initListener()
+        }
+        else{
+            if (isNetworkAvailable()) {
+                showProgress(true)
+                getWooApi().getProductDetail(mProductId).enqueue(object : Callback<Product> {
+                    override fun onFailure(call: Call<Product>, t: Throwable) {
+                        showProgress(false)
+                    }
+                    override fun onResponse(call: Call<Product>, response: Response<Product>) {
+                        if (response.body() != null) {
+                            product = response.body()!!
+                            getProductDetail(product)
+                            initListener()
+                        }
+                        showProgress(false)
+                    }
+                })
+            }
+        }
+    }
 
-
-
+    fun initListener(){
         btnAddCard.setOnClickListener {
-            // TODO: 17/01/2021  need torepar
-           // addItemToCart()
+            if (isAddedToCart)
+                removeCartItem(product)
+            else
+                addToCart(product)
         }
         llReviews.setOnClickListener() {
-           /* launchActivity<ReviewsActivity> {
-                putExtra(PRODUCT_ID, intent?.getIntExtra(PRODUCT_ID, 0)!!)
-            }*/
+            /* launchActivity<ReviewsActivity> {
+                 putExtra(PRODUCT_ID, intent?.getIntExtra(PRODUCT_ID, 0)!!)
+             }*/
         }
-
         toolbar_layout.setCollapsedTitleTextAppearance(R.style.CollapsedAppBar)
-       // toolbar_layout.setContentScrimColor(Color.parseColor(getPrimaryColor()))
+        // toolbar_layout.setContentScrimColor(Color.parseColor(getPrimaryColor()))
         app_bar.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { _, verticalOffset ->
             if (abs(verticalOffset) - app_bar.totalScrollRange == 0) {
                 toolbar_layout.title = tvName.text
@@ -146,21 +167,49 @@ class ProductDetailActivity1 : AppCompatActivity() {
                 toolbar_layout.title = ""
             }
         })
-
         ivFavourite.setOnClickListener {
             onFavouriteClick()
         }
     }
 
-   /* private fun mAddCart(model: Product) {
-        if (isLoggedIn()) {
-            val requestModel = RequestModel()
-            requestModel.pro_id = model.id
-            requestModel.quantity = 1
-            addItemToCart(requestModel, onApiSuccess = {
-            })
-        } else launchActivity<SignInUpActivity> { }
-    }*/
+    private fun removeCartItem(product: Product) {
+        val isItemRemoverd = getRoom().Dao().DeleteCart(CartItem(
+                productId = product.id,
+                productImage = product.images.first().src!!,
+                quantity = 1,
+                price = product.price,
+                regular_price = product.regular_price,
+                sale_price = product.sale_price
+
+        ))
+        Toast.makeText(this,isItemRemoverd.toString(),Toast.LENGTH_SHORT).show()
+        if (isItemRemoverd != -1) {
+            btnAddCard.text = getString(R.string.lbl_add_to_cart)
+            isAddedToCart = false
+            if (count != 0)
+                getSharedPrefInstance().setValue(Constants.SharedPref.KEY_CART_COUNT, count - 1)
+            setCartCount()
+        }
+    }
+
+    private fun addToCart(product: Product) {
+        val isItemAdded = getRoom().Dao().addToCart(CartItem(
+                productId = product.id,
+                productImage = product.images.first().src!!,
+                quantity = 1,
+                price = product.price,
+                regular_price = product.regular_price,
+                sale_price = product.sale_price
+
+        ))
+        if (isItemAdded != (-1).toLong()) {
+            getSharedPrefInstance().setValue(Constants.SharedPref.KEY_CART_COUNT, count + 1)
+            setCartCount()
+            btnAddCard.text = getString(R.string.lbl_remove_cart)
+            isAddedToCart = true
+        }
+
+    }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_dashboard, menu)
@@ -170,72 +219,31 @@ class ProductDetailActivity1 : AppCompatActivity() {
         menuSearchItem.isVisible = false
         mMenuCart = menuWishItem.actionView
         menuWishItem.actionView.setOnClickListener {
-            // TODO: 17/01/2021  need to reper
-
-             //launchActivity<MyCartActivity>()
+            startActivity(Intent(this, MyCartActivity::class.java))
         }
-        //setCartCount()
+        setCartCount()
         return super.onCreateOptionsMenu(menu)
     }
 
-    private fun setCartCountFromPref() {
-    /*    if (isLoggedIn()) {
-            val count = getCartCount()
-            mMenuCart.ivCart?.changeBackgroundImageTint(getAccentColor())
-            mMenuCart.tvNotificationCount?.changeTint(getAccentColor())
-            mMenuCart.tvNotificationCount?.text = count
-            if (count.checkIsEmpty() || count == "0") {
-                mMenuCart.tvNotificationCount?.hide()
-            } else {
-                mMenuCart.tvNotificationCount?.show()
-            }
-        }
-*/
-    }
-
-    private fun addItemToCart() {
-     /*   val requestModel = RequestModel()
-        requestModel.pro_id = mPId
-        requestModel.quantity = mQuantity.toInt()
-        addItemToCart(requestModel, onApiSuccess = {
-            btnAddCard.text = getString(R.string.lbl_remove_cart)
-            isAddedToCart = true
-            fetchAndStoreCartData()
-
-        })*/
-    }
-
-    private fun addItemToCartGroupItem(id: Int) {
-      /*  val requestModel = RequestModel()
-        requestModel.pro_id = id
-        requestModel.quantity = mQuantity.toInt()
-        addItemToCart(requestModel, onApiSuccess = {
-            fetchAndStoreCartData()
-
-        })*/
-
+    override fun onResume() {
+        super.onResume()
+        setCartCount()
     }
 
     private fun setCartCount() {
-     /*   val count = getCartCount()
-        mMenuCart.tvNotificationCount.text = count
-        if (count.checkIsEmpty() || count == "0") {
-            mMenuCart.tvNotificationCount.hide()
+        count = getCartCount()
+        // mMenuCart?.ivCart?.changeBackgroundImageTint(getTextTitleColor())
+        // mMenuCart?.tvNotificationCount?.changeTint(getTextTitleColor())
+        val tvNotificationCount: TextView? = mMenuCart?.findViewById(R.id.tvNotificationCount)
+        tvNotificationCount?.text = count.toString()
+        // tvNotificationCount?.changeAccentColor()
+        if (count == 0) {
+            tvNotificationCount?.hide()
         } else {
-            mMenuCart.tvNotificationCount.show()
-        }*/
+            tvNotificationCount?.show()
+        }
     }
 
-    private fun removeCartItem() {
-      /*  val requestModel = RequestModel()
-        requestModel.pro_id = mPId
-        removeCartItem(requestModel, onApiSuccess = {
-            btnAddCard.text = getString(R.string.lbl_add_to_cart)
-            isAddedToCart = false
-            fetchAndStoreCartData()
-
-        })*/
-    }
 
     private fun getProductDetail(product: Product) {
         scrollView.visibility = View.VISIBLE
@@ -249,8 +257,7 @@ class ProductDetailActivity1 : AppCompatActivity() {
 
         tvTags.text = product.description.getHtmlString().toString()
 
-        // TODO: 22/01/2021 manage out of stock 
-        if (product.stock_status.equals("instock")) {
+        if (product.stock_status == "instock") {
             btnOutOfStock.hide()
             btnAddCard.show()
         } else {
@@ -360,7 +367,6 @@ class ProductDetailActivity1 : AppCompatActivity() {
                                 mYearAdapter!!.notifyDataSetChanged()
                             }
                         }
-
                         override fun onNothingSelected(parent: AdapterView<*>) {}
                     }
 
@@ -413,11 +419,12 @@ class ProductDetailActivity1 : AppCompatActivity() {
         }
 
         //Reviews
-        if (product.isReviews_allowed == true) {
-            tvAllReviews.show()
+        if (product.isReviews_allowed) {
+            // TODO: 06/02/2021   tvAllReviews.show() just for now
+            tvAllReviews.hide()
+
             llReviews.show()
             tvAllReviews.setOnClickListener {
-                // TODO: 17/01/2021
                 // launchActivity<ReviewsActivity> { putExtra(PRODUCT_ID, intent?.getIntExtra(PRODUCT_ID, 0)!!) }
             }
         } else {
@@ -434,7 +441,7 @@ class ProductDetailActivity1 : AppCompatActivity() {
             rvLike.show()
             // TODO: 17/01/2021 add all category instead one and fix exclude currant
             if (isNetworkAvailable()) {
-                getWooApi().getProductByCategory(1,5,product.categories.get(0).id).enqueue(object : Callback<List<Product>> {
+                getWooApi().getProductByCategory(1, 5, product.categories[0].id).enqueue(object : Callback<List<Product>> {
                     override fun onFailure(call: Call<List<Product>>, t: Throwable) {}
                     override fun onResponse(call: Call<List<Product>>, response: Response<List<Product>>) {
                         mProductAdapter.addItems(response.body()!!)
@@ -459,32 +466,25 @@ class ProductDetailActivity1 : AppCompatActivity() {
         // check cart & wish list
 
         // TODO: 17/01/2021 need reper
-        /* when {
-                        it[0].is_added_cart -> {
-                            if (mIsExternalProduct) {
-                                btnAddCard.text = it[0].buttonText
-                            } else {
-                                isAddedToCart = true
-                                btnAddCard.text = getString(R.string.lbl_remove_cart)
-                            }
-                        }
-                        else -> {
-                            if (mIsExternalProduct) {
-                                btnAddCard.text = it[0].buttonText
-                            } else {
-                                isAddedToCart = false
-                                btnAddCard.text = getString(R.string.lbl_add_to_cart)
-                            }
-                        }
-                    }*/
+
+        when {
+            getRoom().Dao().isCartAdded(product.id) -> {
+                isAddedToCart = true
+                btnAddCard.text = getString(R.string.lbl_remove_cart)
+            }
+            else -> {
+                isAddedToCart = false
+                btnAddCard.text = getString(R.string.lbl_add_to_cart)
+            }
+        }
 
         when {
             getRoom().Dao().isFavsAdded(product.id) -> {
                 mIsInWishList = true
-                changeFavIcon(R.drawable.ic_heart_fill, getPrimaryColor())
+                changeFavIcon(R.drawable.ic_heart_fill)
             }else -> {
             mIsInWishList = false
-            changeFavIcon(R.drawable.ic_heart, getPrimaryColor())
+            changeFavIcon(R.drawable.ic_heart, R.color.colorAccent)
         }
         }
 
@@ -566,7 +566,7 @@ class ProductDetailActivity1 : AppCompatActivity() {
 
     private fun onFavouriteClick() {
         if (mIsInWishList) {
-            changeFavIcon(R.drawable.ic_heart, getPrimaryColor())
+            changeFavIcon(R.drawable.ic_heart,R.color.colorAccent)
             ivFavourite.isClickable = false
 
             val favModel = FavModel()
@@ -575,12 +575,9 @@ class ProductDetailActivity1 : AppCompatActivity() {
             getRoom().Dao().deleteFav(favModel).apply {
                 ivFavourite.isClickable = true
                 mIsInWishList = false
-
-                // changeFavIcon(R.drawable.ic_heart, getPrimaryColor())
-                // changeFavIcon(R.drawable.ic_heart_fill, getPrimaryColor())
             }
         } else {
-            changeFavIcon(R.drawable.ic_heart_fill, getPrimaryColor());
+            changeFavIcon(R.drawable.ic_heart_fill);
             ivFavourite.isClickable = false
 
             val favModel = FavModel()
@@ -589,24 +586,16 @@ class ProductDetailActivity1 : AppCompatActivity() {
             getRoom().Dao().insertFav(favModel).apply {
                 ivFavourite.isClickable = true
                 mIsInWishList = true
-
-                // changeFavIcon(R.drawable.ic_heart_fill, getPrimaryColor())
-                // changeFavIcon(R.drawable.ic_heart, getAccentColor())
             }
-
-
         }
     }
 
-    private fun changeFavIcon(drawable: Int, iconTint: String = getAccentColor()) {
-        // TODO: 17/01/2021
+    private fun changeFavIcon(drawable: Int, iconTint: Int = R.color.colorPrimary) {
         ivFavourite.setImageResource(drawable)
-        //ivFavourite.changeBackgroundImageTint(iconTint)
+        ivFavourite.colorFilter = PorterDuffColorFilter(ContextCompat.getColor(this, iconTint), PorterDuff.Mode.SRC_IN)
     }
 
-
-
-  /**  private fun changeColor() {
+  /*  private fun changeColor() {
         tvAvailability.changeAccentColor()
         tvSaleDiscount.changeTextPrimaryColor()
         tvName.changeTextPrimaryColor()
@@ -683,7 +672,7 @@ class ProductDetailActivity1 : AppCompatActivity() {
       }
   }
 
-    // Grouped product
+
     private val mGroupCartAdapter = BaseAdapter<Product>(R.layout.item_group, onBind = { view, model, _ ->
 
         val ivProduct = view.findViewById<ImageView>(R.id.ivProduct)
@@ -713,10 +702,8 @@ class ProductDetailActivity1 : AppCompatActivity() {
                 tvPrice.text = model.regular_price.currencyFormat()
             }
         }
-
         tvAdd.setOnClickListener {
-            // TODO: 17/01/2021 need reper
-            //addItemToCartGroupItem(model.id)
+            addToCart(model)
         }
     })
     //product you may be like
@@ -790,9 +777,7 @@ class ProductDetailActivity1 : AppCompatActivity() {
 
         }
         tvAdd.setOnClickListener {
-
-            // TODO: 17/01/2021  need to reper
-            // mAddCart(model)
+            addToCart(model)
         }
     }
 

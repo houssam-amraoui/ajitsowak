@@ -161,7 +161,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@color/textColorPrimary</item>
         <item name="android:textSize">@dimen/font_size_medium</item>
-
+        <item name="fontFamily">@string/font_Bold</item>
         <item name="android:layout_centerVertical">true</item>
     </style>
 

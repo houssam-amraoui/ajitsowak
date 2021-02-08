@@ -30,7 +30,7 @@ import java.text.ParseException
 import kotlin.math.roundToInt
 
 @SuppressLint("SetTextI18n")
-class OrderActivity : AppCompatActivity() {
+class OrderActivity : mAppCompatActivity() {
 
     private val mOrderAdapter = BaseAdapter<Order>(R.layout.item_orderlist, onBind = { view, model, position ->
         val ivProduct: ImageView = view.findViewById(R.id.ivProduct)
@@ -101,8 +101,6 @@ class OrderActivity : AppCompatActivity() {
         }
     }
 
-
-
     var orders:List<OrderItem> = ArrayList()
 
     private lateinit var rvOrder: RecyclerView
@@ -137,8 +135,11 @@ class OrderActivity : AppCompatActivity() {
             orders.forEachIndexed { index, order ->
                 temp[index] = order.orderId
             }
+            showProgress(true)
             getWooApi().getOrderIncludeId(temp).enqueue(object : Callback<List<Order>> {
-                override fun onFailure(call: Call<List<Order>>, t: Throwable) {}
+                override fun onFailure(call: Call<List<Order>>, t: Throwable) {
+                    showProgress(false)
+                }
                 override fun onResponse(call: Call<List<Order>>, response: Response<List<Order>>) {
                     if (response.body() != null) {
                         rlNoData.hide()
@@ -146,6 +147,7 @@ class OrderActivity : AppCompatActivity() {
                         mOrderAdapter.addItems(response.body()!!)
                         getSharedPrefInstance().setValue(KEY_ORDER_COUNT, orders.size)
                     }
+                    showProgress(false)
                 }
             })
         }

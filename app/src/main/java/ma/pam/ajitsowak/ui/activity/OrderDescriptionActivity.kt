@@ -32,7 +32,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-class OrderDescriptionActivity : AppCompatActivity() {
+class OrderDescriptionActivity : mAppCompatActivity() {
 
     private lateinit var orderModel: Order
     private var totalAmt = 0.0
@@ -230,7 +230,7 @@ class OrderDescriptionActivity : AppCompatActivity() {
         val spinner: Spinner = customLayout.findViewById(R.id.spinner)
 
 
-        val adapter: ArrayAdapter<String> = ArrayAdapter<String>(applicationContext, R.layout.spinner_items, status)
+        val adapter: ArrayAdapter<String> = ArrayAdapter(applicationContext, R.layout.spinner_items, status)
         spinner.adapter = adapter
         builder.setView(customLayout) // add a button
 
@@ -240,8 +240,11 @@ class OrderDescriptionActivity : AppCompatActivity() {
             if (isNetworkAvailable()) {
 
                 val orderRequest = Order()
+                orderRequest.id = orderModel.id
                 orderRequest.status = "cancelled"
                 orderRequest.customer_note = spinner.selectedItem.toString()
+
+                showProgress(true)
 
                 getWooApi().updateOreder(orderModel.id,orderRequest).enqueue(object: Callback<Order>{
                     override fun onFailure(call: Call<Order>, t: Throwable) { dialog.dismiss()}
@@ -253,10 +256,13 @@ class OrderDescriptionActivity : AppCompatActivity() {
                                 "\"message\":\"Order Canceled by you due to " + spinner.selectedItem.toString() + ".\"\n" +
                                 "} "
                         getWooApi().addOrderNotes(orderModel.id,notes).enqueue(object: Callback<OrderNote>{
-                            override fun onFailure(call: Call<OrderNote>, t: Throwable) {}
+                            override fun onFailure(call: Call<OrderNote>, t: Throwable) {
+                                showProgress(false)
+                            }
                             override fun onResponse(call: Call<OrderNote>, response: Response<OrderNote>) {
                                 setResult(Activity.RESULT_OK)
                                 finish()
+                                showProgress(false)
                             }
                         })
                         dialog.dismiss()
@@ -364,8 +370,6 @@ class OrderDescriptionActivity : AppCompatActivity() {
             }
         }
 
-
-
         if (!orderModel.billingAddress.phone.isNullOrEmpty()) {
             shippingAddress = if (shippingAddress.isNotBlank()) {
                 shippingAddress + "\n" + getString(R.string.lbl_phone_number) + orderModel.billingAddress.phone
@@ -386,7 +390,6 @@ class OrderDescriptionActivity : AppCompatActivity() {
                 orderModel.billingAddress.address1!!
             }
         }
-
         if (!orderModel.billingAddress.address2.isNullOrEmpty()) {
             billingAddress = if (billingAddress.isNotBlank()) {
                 billingAddress + "\n" + orderModel.billingAddress.address2
@@ -394,7 +397,6 @@ class OrderDescriptionActivity : AppCompatActivity() {
                 orderModel.billingAddress.address2!!
             }
         }
-
         if (!orderModel.billingAddress.city.isNullOrEmpty()) {
             billingAddress = if (billingAddress.isNotBlank()) {
                 billingAddress + "\n" + orderModel.billingAddress.city
@@ -402,7 +404,6 @@ class OrderDescriptionActivity : AppCompatActivity() {
                 orderModel.billingAddress.city!!
             }
         }
-
         if (!orderModel.billingAddress.postcode.isNullOrEmpty()) {
             billingAddress = if (billingAddress.isNotBlank()) {
                 billingAddress + " - " + orderModel.billingAddress.postcode
@@ -410,7 +411,6 @@ class OrderDescriptionActivity : AppCompatActivity() {
                 orderModel.billingAddress.postcode!!
             }
         }
-
         if (!orderModel.billingAddress.state.isNullOrEmpty()) {
             billingAddress = if (billingAddress.isNotBlank()) {
                 billingAddress + "\n" + orderModel.billingAddress.state
@@ -418,7 +418,6 @@ class OrderDescriptionActivity : AppCompatActivity() {
                 orderModel.billingAddress.state!!
             }
         }
-
         if (!orderModel.billingAddress.country.isNullOrEmpty()) {
             billingAddress = if (billingAddress.isNotBlank()) {
                 billingAddress + "\n" + orderModel.billingAddress.country
@@ -426,7 +425,6 @@ class OrderDescriptionActivity : AppCompatActivity() {
                 orderModel.billingAddress.country!!
             }
         }
-
         tvBillingUserAddress.text = billingAddress
         tvListPrice.text = "0".currencyFormat()
         tvSellingPrice.text = "0".currencyFormat()

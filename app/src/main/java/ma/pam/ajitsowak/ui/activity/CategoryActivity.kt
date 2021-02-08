@@ -19,7 +19,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class CategoryActivity : AppCompatActivity() {
+class CategoryActivity : mAppCompatActivity() {
     private var showPagination: Boolean? = true
     private var mIsLoading = false
     private var countLoadMore = 1
@@ -95,17 +95,16 @@ class CategoryActivity : AppCompatActivity() {
                 })
             }
         }
-
     }
 
     private fun loadData() {
         if (isNetworkAvailable()) {
+            showProgress(true)
             getWooApi().getAllCategory(countLoadMore,8).enqueue(object : Callback<List<Category>> {
                 override fun onFailure(call: Call<List<Category>>, t: Throwable) {
+                    showProgress(false)
                 }
                 override fun onResponse(call: Call<List<Category>>, response: Response<List<Category>>) {
-
-                    val aa=response.body()
 
                     if (countLoadMore == 1) {
                         mProductAdapter.clearItems()
@@ -121,10 +120,9 @@ class CategoryActivity : AppCompatActivity() {
                     } else {
                         rvNewestProduct.show()
                     }
+                    showProgress(false)
                 }
             })
-
-
         }
     }
     private fun changeColor()

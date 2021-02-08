@@ -10,6 +10,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
@@ -42,16 +43,16 @@ class HomeFragment1 : Fragment() {
     private var image: String = ""
     private lateinit var lan: String
     private var count:Int = 0
-    private var mViewNewest: View? = null
-    private var mViewFeatured: View? = null
-    private var mViewPopular: View? = null
-    private var mViewRand: View? = null
-    private var mViewRecentProduct: View? = null
-    private var mViewOnSale: View? = null
-    private var mViewMostRate: View? = null
-    private var mSliderView: View? = null
+    private lateinit var mViewNewest: View
+    private lateinit var mViewFeatured: View
+    private lateinit var mViewPopular: View
+    private lateinit var mViewRand: View
+    private lateinit var mViewRecentProduct: View
+    private lateinit var mViewOnSale: View
+    private lateinit var mViewMostRate: View
+    private lateinit var mSliderView: View
 
-    private var mLLDynamic: LinearLayout? = null
+    private lateinit var mLLDynamic: LinearLayout
 
 
     private fun setProductItem(view: View, model: Product, params: Boolean = false) {
@@ -148,7 +149,6 @@ class HomeFragment1 : Fragment() {
     }*/
 
     private fun addToCart(product: Product) {
-
         val isItemAdded = getRoom().Dao().addToCart(CartItem(
                 productId = product.id,
                 productImage = product.images.first().src!!,
@@ -272,7 +272,7 @@ class HomeFragment1 : Fragment() {
     }
 
     private fun addSlider(productList: List<String>) {
-        val slideViewPager = mSliderView!!.findViewById(R.id.slideViewPager) as ViewPager
+        val slideViewPager = mSliderView.findViewById(R.id.slideViewPager) as ViewPager
         //val dots = mSliderView!!.findViewById(R.id.dots) as DotsIndicator
 
         val adapter1 = HomeSliderAdapter(productList)
@@ -282,9 +282,8 @@ class HomeFragment1 : Fragment() {
         slideViewPager.pageMargin = resources.getDimensionPixelOffset(R.dimen._6sdp)
        // slideViewPager.setPageTransformer(false, object : CarouselEffectTransformer(activity) {})
 
-        mLLDynamic!!.addView(mSliderView!!)
+        mLLDynamic.addView(mSliderView)
     }
-
    /* private fun loadApis() {
         if (isNetworkAvailable()) {
             activity!!.fetchAndStoreCartData()
@@ -323,7 +322,7 @@ class HomeFragment1 : Fragment() {
         }
     }
 
-    fun setCartCount() {
+    private fun setCartCount() {
         count = getCartCount()
        // mMenuCart?.ivCart?.changeBackgroundImageTint(getTextTitleColor())
        // mMenuCart?.tvNotificationCount?.changeTint(getTextTitleColor())
@@ -339,32 +338,33 @@ class HomeFragment1 : Fragment() {
 
     private fun listAllProducts() {
         if (isNetworkAvailable()) {
-
             addSlider(listOf("https://image.freepik.com/free-vector/best-sale-banner-origami-style_23-2148386593.jpg",
                     "https://image.freepik.com/free-vector/abstract-colorful-best-sale-banner_23-2148340539.jpg",
                     "https://image.freepik.com/vecteurs-libre/collection-etiquettes-best-sale_41577-131.jpg")
             )
 
-            mLLDynamic!!.addView(mViewNewest!!)
-            mLLDynamic!!.addView(mViewPopular!!)
-            mLLDynamic!!.addView(mViewFeatured!! )
-            mLLDynamic!!.addView(mViewRand!!)
-            mLLDynamic!!.addView(mViewOnSale!!)
-            mLLDynamic!!.addView(mViewMostRate!!)
+            mLLDynamic.addView(mViewNewest)
+            mLLDynamic.addView(mViewPopular)
+            mLLDynamic.addView(mViewFeatured )
+            mLLDynamic.addView(mViewRand)
+            mLLDynamic.addView(mViewOnSale)
+            mLLDynamic.addView(mViewMostRate)
 
-            mViewNewest?.visibility = GONE
-            mViewPopular?.visibility = GONE
-            mViewFeatured?.visibility = GONE
-            mViewRand?.visibility = GONE
-            mViewOnSale?.visibility = GONE
-            mViewMostRate?.visibility = GONE
+            mViewNewest.visibility = GONE
+            mViewPopular.visibility = GONE
+            mViewFeatured.visibility = GONE
+            mViewRand.visibility = GONE
+            mViewOnSale.visibility = GONE
+            mViewMostRate.visibility = GONE
+
+            (activity as mAppCompatActivity).showProgress(true)
 
             getWooApi().getNewProducts(1,5).enqueue(object : Callback<List<Product>> {
                 override fun onFailure(call: Call<List<Product>>, t: Throwable) {}
                 override fun onResponse(call: Call<List<Product>>, response: Response<List<Product>>) {
                     if (!response.body().isNullOrEmpty()) {
                         onAddView(mView = mViewNewest, title = "New Product", mViewAll = "ViewAll", code = Constants.viewAllCode.NEWEST, productList = response.body()!!, modelSize = 5)
-                        mViewNewest?.visibility = VISIBLE
+                        mViewNewest.visibility = VISIBLE
                     }
                 }
             })
@@ -374,7 +374,7 @@ class HomeFragment1 : Fragment() {
                 override fun onResponse(call: Call<List<Product>>, response: Response<List<Product>>) {
                     if (!response.body().isNullOrEmpty()) {
                         onAddView(mView = mViewPopular, title = "Popular", mViewAll = "ViewAll", code = POPULAR, productList = response.body()!!, modelSize = 5)
-                        mViewPopular?.visibility = VISIBLE
+                        mViewPopular.visibility = VISIBLE
                     }
                 }
             })
@@ -384,7 +384,7 @@ class HomeFragment1 : Fragment() {
                 override fun onResponse(call: Call<List<Product>>, response: Response<List<Product>>) {
                     if (!response.body().isNullOrEmpty()) {
                         onAddView(mView = mViewFeatured, isGridView = true, title = "Featured", mViewAll = "ViewAll", code = FEATURED, productList = response.body()!!, modelSize = 5)
-                        mViewFeatured?.visibility = VISIBLE
+                        mViewFeatured.visibility = VISIBLE
                     }
 
                 }
@@ -395,7 +395,7 @@ class HomeFragment1 : Fragment() {
                 override fun onResponse(call: Call<List<Product>>, response: Response<List<Product>>) {
                     if (!response.body().isNullOrEmpty()) {
                         onAddView(mView = mViewRand, title = "You May Also Like", mViewAll = "ViewAll", code = RANDOM, productList = response.body()!!, modelSize = 5)
-                        mViewRand?.visibility = VISIBLE
+                        mViewRand.visibility = VISIBLE
                     }
                 }
             })
@@ -409,26 +409,25 @@ class HomeFragment1 : Fragment() {
                         var product = response.body()!!
 
                         onAddView(mView = mViewOnSale, isGridView = true, title = "On Sale", mViewAll = "ViewAll", code = SALE, productList = response.body()!!, modelSize = 5)
-                        mViewOnSale?.visibility = VISIBLE
+                        mViewOnSale.visibility = VISIBLE
                     }
                 }
             })
             getWooApi().getMostRateProduct(1,5).enqueue(object : Callback<List<Product>> {
-                override fun onFailure(call: Call<List<Product>>, t: Throwable) {}
+                override fun onFailure(call: Call<List<Product>>, t: Throwable) {
+                    (activity as mAppCompatActivity).showProgress(false)
+                }
                 override fun onResponse(call: Call<List<Product>>, response: Response<List<Product>>) {
                     if (!response.body().isNullOrEmpty()){
                         onAddView(mView = mViewMostRate, title = "Most Rate", mViewAll = "ViewAll", code = MOSTRATE, productList = response.body()!!, modelSize = 5)
-                        mViewMostRate?.visibility = VISIBLE
+                        mViewMostRate.visibility = VISIBLE
                     }
+                    (activity as mAppCompatActivity).showProgress(false)
                 }
             })
         }
     }
-
     /*private fun setNewLocale(language: String) {
         MyApp.changeLanguage(language)
     }*/
-
-
-
 }

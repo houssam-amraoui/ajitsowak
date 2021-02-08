@@ -1,6 +1,9 @@
 package ma.pam.ajitsowak.utils
 
 import android.app.Activity
+import android.graphics.Color
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.util.Log
 import android.widget.ImageView
 import androidx.annotation.DrawableRes
@@ -28,3 +31,4 @@ fun ImageView.loadImageFromDrawable(@DrawableRes aPlaceHolderImage: Int) {
     Glide.with(getAppInstance()).load(aPlaceHolderImage).diskCacheStrategy(DiskCacheStrategy.NONE)
             .into(this)
 }
+

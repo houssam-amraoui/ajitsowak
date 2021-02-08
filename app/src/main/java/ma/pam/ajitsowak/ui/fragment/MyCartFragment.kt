@@ -2,27 +2,27 @@ package ma.pam.ajitsowak.ui.fragment
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.text.SpannableString
 import android.util.Log
 import android.view.*
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import ma.pam.ajitsowak.ui.activity.OrderSummaryActivity
-import ma.pam.ajitsowak.adapter.BaseAdapter
 import ma.pam.ajitsowak.MyApp.getRoom
 import ma.pam.ajitsowak.R
+import ma.pam.ajitsowak.adapter.BaseAdapter
 import ma.pam.ajitsowak.model.ShippingZoneMethod
+
 import ma.pam.ajitsowak.room.CartItem
-import ma.pam.ajitsowak.ui.activity.CouponActivity
-import ma.pam.ajitsowak.ui.activity.DashBoardActivity
-import ma.pam.ajitsowak.ui.activity.EditProfileActivity
-import ma.pam.ajitsowak.ui.activity.WishlistActivity
+import ma.pam.ajitsowak.ui.activity.*
+import ma.pam.ajitsowak.ui.activity.MainActivity
 import ma.pam.ajitsowak.utils.*
 import ma.pam.ajitsowak.utils.Constants.KeyIntent.DISCOUNT
 import ma.pam.ajitsowak.utils.Constants.KeyIntent.PRICE
@@ -95,38 +95,37 @@ class MyCartFragment : Fragment() {
         ivAdd.setOnClickListener { addClick(model, position) }
 
         front_layout.setOnClickListener {
-            // TODO: 24/01/2021 reper this
-           /* startActivity(Intent(activity, ProductDetailActivity1::class.java).apply {
-                putExtra(DATA, model.)
-            })*/
+            startActivity(Intent(activity, ProductDetailActivity1::class.java).apply {
+                putExtra(Constants.KeyIntent.PRODUCT_ID, model.productId)
+            })
         }
-            //tvProductName.changeTextPrimaryColor()
-            //qty_spinner.changeTextPrimaryColor()
+        //tvProductName.changeTextPrimaryColor()
+        //qty_spinner.changeTextPrimaryColor()
 
-           // ivMinus.backgroundTintList=ColorStateList.valueOf(Color.parseColor(getPrimaryColor()))
-           // ivAdd.backgroundTintList=ColorStateList.valueOf(Color.parseColor(getPrimaryColor()))
-           // tvPrice.changeTextPrimaryColor()
-           // tvOriginalPrice.changeTextSecondaryColor()
-           // delete_layout.setCardBackgroundColor(Color.parseColor(getButtonColor()))
-        })
+        // ivMinus.backgroundTintList=ColorStateList.valueOf(Color.parseColor(getPrimaryColor()))
+        // ivAdd.backgroundTintList=ColorStateList.valueOf(Color.parseColor(getPrimaryColor()))
+        // tvPrice.changeTextPrimaryColor()
+        // tvOriginalPrice.changeTextSecondaryColor()
+        // delete_layout.setCardBackgroundColor(Color.parseColor(getButtonColor()))
+    })
 
     private val mShippingMethodAdapter = BaseAdapter<ShippingZoneMethod>(R.layout.item_shipping_method, onBind = { view, model, position ->
         val shippingMethod = view.findViewById<TextView>(R.id.shippingMethod)
         val imgDone = view.findViewById<ImageView>(R.id.imgDone)
 
-            if (model.method_id == "free_shipping" || model.cost.value == "0" || model.cost.value.isEmpty()) {
+        if (model.method_id == "free_shipping" || model.settings.cost.value == "0" || model.settings.cost.value.isEmpty()) {
 
-                shippingMethod.text = model.method_title
-            } else {
-                shippingMethod.text = model.method_title+ ": " + model.cost.value.currencyFormat()
-            }
-            if (selectedMethod == position) {
-                imgDone.setImageResource(R.drawable.ic_baseline_done_24)
-            } else {
-                imgDone.setImageResource(R.drawable.bg_ractangal)
-            }
-           // shippingMethod.changeTextPrimaryColor()
-        })
+            shippingMethod.text = model.method_title
+        } else {
+            shippingMethod.text = model.method_title + ": " + model.settings.cost.value.currencyFormat()
+        }
+        if (selectedMethod == position) {
+            imgDone.setImageResource(R.drawable.ic_baseline_done_24)
+        } else {
+            imgDone.setImageResource(R.drawable.bg_ractangal)
+        }
+        // shippingMethod.changeTextPrimaryColor()
+    })
 
     private fun addClick(model: CartItem, position: Int) {
         val qty = model.quantity
@@ -200,7 +199,7 @@ class MyCartFragment : Fragment() {
                 val mAmount = mTotalCount + mShippingCost.toDouble()
                 if (shippingMethodsAvailble.isNotEmpty()) {
                     if (selectedMethod == -1) {
-                        Toast.makeText(activity,"Select Shipping Method",Toast.LENGTH_SHORT).show()
+                        Toast.makeText(activity, "Select Shipping Method", Toast.LENGTH_SHORT).show()
                         return@setOnClickListener
                     }
                     selectedShippingMethod = shippingMethodsAvailble[selectedMethod]
@@ -225,7 +224,7 @@ class MyCartFragment : Fragment() {
         }
 
         tvChange.setOnClickListener {
-            startActivityForResult(Intent(activity, EditProfileActivity::class.java),Constants.RequestCode.EDIT_PROFILE)
+            startActivityForResult(Intent(activity, EditProfileActivity::class.java), Constants.RequestCode.EDIT_PROFILE)
         }
         rvCart.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         rvCart.adapter = mCartAdapter
@@ -237,10 +236,10 @@ class MyCartFragment : Fragment() {
             onShippingMethodChanged(pos, model)
         }
         btnShopNow.setOnClickListener {
-            startActivity(Intent(activity,DashBoardActivity::class.java))
+            startActivity(Intent(activity, DashBoardActivity::class.java))
         }
 
-        if (getSharedPrefInstance().getBooleanValue(Constants.SharedPref.ENABLE_COUPONS, true)) {
+        if (getSharedPrefInstance().getBooleanValue(Constants.SharedPref.ENABLE_COUPONS, false)) {
             rlCoupon.visibility = View.VISIBLE
         } else {
             rlCoupon.visibility = View.GONE
@@ -255,17 +254,16 @@ class MyCartFragment : Fragment() {
 
             selectedMethod = pos
             mShippingMethodAdapter.notifyDataSetChanged()
-            if (model.id == "free_shipping") {
+            if (model.method_id == "free_shipping") {
                 tvShipping.text = "Free"
                 mShippingCost = "0"
                // tvShipping.setTextColor(activity!!.color(R.color.green))
                 llShippingAmount.show()
-                Log.d("mTotalCount", mTotalCount.toString())
             } else {
-                if (model.cost.value.isNullOrEmpty()) {
-                    model.cost.value = "0"
+                if (model.settings.cost.value.isNullOrEmpty()) {
+                    model.settings.cost.value = "0"
                 }
-                mShippingCost = model.cost.value
+                mShippingCost = model.settings.cost.value
                 llShippingAmount.show()
                // tvShipping.changeTextSecondaryColor()
                 tvShipping.text = mShippingCost.currencyFormat()
@@ -312,21 +310,21 @@ class MyCartFragment : Fragment() {
         }
     }
 
-
-
     private fun removeMultipleCartItem() {
-        // TODO: 24/01/2021 remove all item
-       /* val requestModel = CartRequestModel()
-        requestModel.multpleId = cartItemId
-        (activity as AppBaseActivity).removeMultipleCartItem(requestModel, onApiSuccess = {
-            activity!!.finish()
-        })*/
+        getRoom().Dao().DeleteAllCart()
+        activity!!.finish()
     }
 
     private fun removeCartItem(model: CartItem) {
-        // TODO: 24/01/2021
-        getRoom().Dao().DeleteCart(model)
-        invalidateCartLayout()
+        // TODO: 07/02/2021 add dialog
+        activity?.getAlertDialog(getString(R.string.msg_confirmation), onPositiveClick = { dialog, i ->
+            getRoom().Dao().DeleteCart(model)
+            invalidateCartLayout()
+            activity?.snackBar(getString(R.string.success))
+        }, onNegativeClick = { dialog, i ->
+            dialog.dismiss()
+        })?.show()
+
     }
 
     fun invalidateCartLayout() {
@@ -388,7 +386,7 @@ class MyCartFragment : Fragment() {
                             tvEditCoupon.text = getString(R.string.lbl_apply)
                             tvEditCoupon.setOnClickListener {
 
-                                startActivityForResult(Intent(activity,CouponActivity::class.java),Constants.RequestCode.COUPON_CODE)
+                                startActivityForResult(Intent(activity, CouponActivity::class.java), Constants.RequestCode.COUPON_CODE)
                             }
                         } else {
                             applyCouponCode()
@@ -424,21 +422,36 @@ class MyCartFragment : Fragment() {
                 val adresse = "$address1$sap$address2$sap$city $postcode$sap$country"
                 tvAddress.text = adresse
             }
-
             // TODO: 28/01/2021 get method shiping  by info -> get id cantry -> get post code
-
             // TODO: 28/01/2021 tomprary insert manualy
 
+
             val sh = ShippingZoneMethod().apply {
-                id="free_shipping"
-                title="Free shipping"
-                order= 2
-                isEnabled= true
                 method_id="free_shipping"
+                title="Free shipping"
+                isEnabled= true
                 method_title = "Free shipping"
             }
+
+            val sh1 = ShippingZoneMethod().apply {
+                method_id="flat_rate"
+                title="Flat rate"
+                isEnabled= true
+                method_title = "Flat rate"
+                settings.cost.value = "5"
+            }
+            val sh2 = ShippingZoneMethod().apply {
+                method_id="local_pickup"
+                title="Local pickup"
+                isEnabled= true
+                method_title = "Local pickup"
+                settings.cost.value = "2"
+            }
+
+
             shippingMethods.clear()
-            shippingMethods.add(sh)
+            shippingMethods.add(sh1)
+            shippingMethods.add(sh2)
             invalidateShippingMethods()
 
         } else {
@@ -543,7 +556,7 @@ class MyCartFragment : Fragment() {
                 if (mTotalCount < mCoupons!!.minimum_amount!!.toFloat()) {
                     txtApplyCouponCode.text = getString(R.string.lbl_coupon_is_valid_only_orders_of) + mCoupons!!.minimum_amount!!.currencyFormat() + getString(
                             R.string.lbl_coupon_is_valid_only_orders_of1
-                        )
+                    )
                     return
                 } else if (mCoupons!!.maximum_amount!!.toFloat() > 0.0) {
                     if (mTotalCount > mCoupons!!.maximum_amount!!.toFloat()) {
@@ -591,7 +604,7 @@ class MyCartFragment : Fragment() {
                     mTotalDiscount = mCoupons!!.amount!!
                     txtDiscountlbl.text = getString(R.string.lbl_discount) + " (" + getString(R.string.lbl_flat) + mCoupons!!.amount!!.currencyFormat() + getString(
                             R.string.lbl_off
-                        ) + ")"
+                    ) + ")"
                 }
                 "fixed_product" -> {
                     val finalAmout = mCoupons!!.amount!!.split(".")
@@ -602,7 +615,7 @@ class MyCartFragment : Fragment() {
                     mTotalDiscount = mCoupons!!.amount!!
                     txtDiscountlbl.text = getString(R.string.lbl_discount) + " (" + getString(R.string.lbl_flat) + mCoupons!!.amount!!.currencyFormat() + getString(
                             R.string.lbl_off1
-                        ) + ")"
+                    ) + ")"
                 }
             }
             if (mTotalDiscount.toDouble() == 0.0) {
@@ -633,7 +646,7 @@ class MyCartFragment : Fragment() {
         tvDiscount.text = "0".currencyFormat()
         tvTotalCartAmount.text = (mTotalCount.toInt() + mShippingCost.toInt()).toString().currencyFormat()
         tvEditCoupon.setOnClickListener {
-            startActivityForResult(Intent(activity,CouponActivity::class.java),Constants.RequestCode.COUPON_CODE)
+            startActivityForResult(Intent(activity, CouponActivity::class.java), Constants.RequestCode.COUPON_CODE)
         }
         invalidateShippingMethods()
     }

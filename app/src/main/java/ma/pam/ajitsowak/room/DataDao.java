@@ -18,15 +18,18 @@ public interface DataDao {
     List<CartItem> getCartList();
 
     @Delete
-    void DeleteCart(CartItem cartItem);
+    int DeleteCart(CartItem cartItem);
 
     @Update
     void UpdateCart(CartItem cartItem);
 
+    @Query("DELETE FROM CartItem")
+    void DeleteAllCart();
+
     @Query("select count(productId) from CartItem")
     int getCartCount();
 
-    @Query("SELECT EXISTS(select * from FavModel where idProduct = :id)")
+    @Query("SELECT EXISTS(select * from CartItem where productId = :id)")
     Boolean isCartAdded(int id);
 
 

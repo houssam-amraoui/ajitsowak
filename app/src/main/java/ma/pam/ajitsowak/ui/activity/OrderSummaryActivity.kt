@@ -103,16 +103,16 @@ class OrderSummaryActivity : AppCompatActivity() {
         }
         if (shippingItems != null) {
             llShippingAmount.show()
-            if (shippingItems!!.id == "free_shipping") {
+            if (shippingItems!!.method_id == "free_shipping") {
                 tvShipping.text = "Free"
                // tvShipping.setTextColor(getColor(R.color.green))
             } else {
-                if (shippingItems!!.cost.value.isEmpty()) {
-                    shippingItems!!.cost.value = "0"
+                if (shippingItems!!.settings.cost.value.isEmpty()) {
+                    shippingItems!!.settings.cost.value = "0"
                 }
                 llShippingAmount.show()
                // tvShipping.changeTextSecondaryColor()
-                tvShipping.text = shippingItems!!.cost.value.currencyFormat()
+                tvShipping.text = shippingItems!!.settings.cost.value.currencyFormat()
             }
         }
         val price = intent.getStringExtra(Constants.KeyIntent.PRICE)
@@ -176,10 +176,10 @@ class OrderSummaryActivity : AppCompatActivity() {
         tvBillingAddress.text = billing.firstName + " " + billing.lastName + "\n" + billing.getFullAddress(sap = "\n")
         if (shippingItems != null) {
             tvMethod.show()
-            if (shippingItems!!.id == "free_shipping" || shippingItems!!.cost.value == "0" || shippingItems!!.cost.value.isEmpty()) {
+            if (shippingItems!!.method_id == "free_shipping" || shippingItems!!.settings.cost.value == "0" || shippingItems!!.settings.cost.value.isEmpty()) {
                 tvMethodName.text = shippingItems!!.method_title
             } else {
-                tvMethodName.text = shippingItems!!.method_title + ": " + shippingItems!!.cost.value.currencyFormat()
+                tvMethodName.text = shippingItems!!.method_title + ": " + shippingItems!!.settings.cost.value.currencyFormat()
             }
         }
 
@@ -224,7 +224,6 @@ class OrderSummaryActivity : AppCompatActivity() {
         billing.email = getEmail()
         val shipping = getShippingList()
 
-
         orderRequest.billingAddress = billing
         orderRequest.shippingAddress = shipping
 
@@ -235,16 +234,16 @@ class OrderSummaryActivity : AppCompatActivity() {
         if (shippingItems != null) {
             val itemData = ShippingLine()
 
-            itemData.method_id = shippingItems?.id
+            itemData.method_id = shippingItems?.method_id
             itemData.method_title= shippingItems?.method_title
 
-            if (shippingItems!!.id == "free_shipping") {
+            if (shippingItems!!.method_id == "free_shipping") {
                 itemData.total = "0"
             } else {
-                if (shippingItems!!.cost.value.isEmpty()) {
-                    shippingItems!!.cost.value = "0"
+                if (shippingItems!!.settings.cost.value.isEmpty()) {
+                    shippingItems!!.settings.cost.value = "0"
                 }
-                itemData.total = shippingItems!!.cost.value
+                itemData.total = shippingItems!!.settings.cost.value
             }
             val list = ArrayList<ShippingLine>()
             list.add(itemData)

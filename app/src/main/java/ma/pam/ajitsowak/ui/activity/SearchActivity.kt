@@ -1,5 +1,6 @@
 package ma.pam.ajitsowak.ui.activity
 
+import android.content.Intent
 import android.graphics.PorterDuff
 import android.os.Bundle
 import android.view.Menu
@@ -15,9 +16,11 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.slider.RangeSlider
+import ma.pam.ajitsowak.MyApp
 import ma.pam.ajitsowak.adapter.BaseAdapter
 import ma.pam.ajitsowak.MyApp.getWooApi
 import ma.pam.ajitsowak.R
+import ma.pam.ajitsowak.room.CartItem
 import ma.pam.ajitsowak.utils.*
 import ma.pam.ajitsowak.woolib.models.Product
 import ma.pam.ajitsowak.woolib.models.filters.ProductFilter
@@ -27,12 +30,12 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class SearchActivity : AppCompatActivity() {
+class SearchActivity : mAppCompatActivity() {
     private var mSearchQuery = ""
     private var mPage = 1
     private var mIsLoading = false
     private var productFilter = ProductFilter()
-
+    private var isLastPage: Boolean = false
 
     private val mProductAdapter = BaseAdapter<Product>(R.layout.item_viewproductgrid, onBind = { view, model, _ ->
             val ivProduct = view.findViewById<ImageView>(R.id.ivProduct)
@@ -89,31 +92,31 @@ class SearchActivity : AppCompatActivity() {
             } else {
                 tvAdd.show()
             }
-            /*view.onClick {
-                if (getProductDetailConstant() == 0) {
-                    launchActivity<ProductDetailActivity1> {
-                        putExtra(Constants.KeyIntent.PRODUCT_ID, model.id)
-                        putExtra(Constants.KeyIntent.DATA, model)
-                    }
-                } else {
-                    launchActivity<ProductDetailActivity2> {
-                        putExtra(Constants.KeyIntent.PRODUCT_ID, model.id)
-                        putExtra(Constants.KeyIntent.DATA, model)
-                    }
-                }
-            }*/
-           /* tvAdd.onClick {
-                addCart(model.id)
-            }*/
+            view.setOnClickListener {
+                startActivity(Intent(this,ProductDetailActivity1::class.java).apply {
+                    putExtra(Constants.KeyIntent.PRODUCT_ID, model.id)
+                    putExtra(Constants.KeyIntent.DATA, model)
+                })
+            }
+            tvAdd.setOnClickListener {
+                addToCart(model)
+            }
         })
 
-   /* private fun addCart(modelId: Int) {
-            val requestModel = RequestModel()
-            requestModel.pro_id = modelId
-            requestModel.quantity = 1
-            addItemToCart(requestModel, onApiSuccess = {
-            })
-    }*/
+    private fun addToCart(product: Product) {
+        val isItemAdded = MyApp.getRoom().Dao().addToCart(CartItem(
+                productId = product.id,
+                productImage = product.images.first().src!!,
+                quantity = 1,
+                price = product.price,
+                regular_price = product.regular_price,
+                sale_price = product.sale_price
+        ))
+        if (isItemAdded != (-1).toLong()){
+            val count = getSharedPrefInstance().getIntValue(Constants.SharedPref.KEY_CART_COUNT,0)
+            getSharedPrefInstance().setValue(Constants.SharedPref.KEY_CART_COUNT, count+1)
+        }
+    }
 
     lateinit var toolbar:Toolbar
     lateinit var searchView:SearchView
@@ -137,7 +140,6 @@ class SearchActivity : AppCompatActivity() {
 
         setToolbar(toolbar)
         //mAppBarColor()
-
         //findViewById<LinearLayout>(R.id.llMain).changeBackgroundColor()
 
         productFilter.setPer_page(8)
@@ -145,7 +147,6 @@ class SearchActivity : AppCompatActivity() {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 mPage = 1
                 mSearchQuery = query!!
-
                 productFilter.setSearch(mSearchQuery)
                 productFilter.setPage(mPage)
 
@@ -156,7 +157,6 @@ class SearchActivity : AppCompatActivity() {
             override fun onQueryTextChange(newText: String): Boolean {
                 return true
             }
-
         })
 
         searchView.setOnCloseListener {
@@ -179,6 +179,7 @@ class SearchActivity : AppCompatActivity() {
                     val countItem = recyclerView.layoutManager?.itemCount
 
                     val lastVisiblePosition = (recyclerView.layoutManager as GridLayoutManager).findLastCompletelyVisibleItemPosition()
+                    if (!isLastPage)
                     if (lastVisiblePosition != 0 && !mIsLoading && countItem?.minus(1) == lastVisiblePosition) {
                         mIsLoading = true
                         mPage = mPage.plus(1)
@@ -187,7 +188,6 @@ class SearchActivity : AppCompatActivity() {
                     }
                 }
             })
-
         }
     }
 
@@ -214,23 +214,24 @@ class SearchActivity : AppCompatActivity() {
     private fun loadProducts() {
 
         if (isNetworkAvailable()) {
-
+            showProgress(true)
             getWooApi().getFilterProduct(productFilter).enqueue(object : Callback<List<Product>> {
                 override fun onFailure(call: Call<List<Product>>, t: Throwable) {
                     if (mPage == 1) {
                         mProductAdapter.clearItems()
                     }
                     rlNoData.show()
+                    showProgress(false)
                 }
                 override fun onResponse(call: Call<List<Product>>, response: Response<List<Product>>) {
                     if (mPage == 1) {
                         mProductAdapter.clearItems()
                     }
-
                     mIsLoading = false
-
                     if (!response.body().isNullOrEmpty()) {
                         mProductAdapter.addMoreItems(response.body()!!)
+                    } else  {
+                        isLastPage = true
                     }
                     if (mProductAdapter.itemCount == 0) {
                         rlNoData.show()
@@ -239,25 +240,16 @@ class SearchActivity : AppCompatActivity() {
                         rlNoData.hide()
                         aSearch_rvSearch.show()
                     }
+                    showProgress(false)
                 }
             })
-
-
-
         }
-
     }
 
-
-
-
     private fun openFilterBottomSheet() {
-
         val filterDialog = BottomSheetDialog(this)
         filterDialog.setContentView(R.layout.layout_filter)
         filterDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
-
-
 
        // val lblFilter:TextView = filterDialog.findViewById(R.id.lblFilter)
        // val tvAttributesName:TextView = filterDialog.findViewById(R.id.tvAttributesName)
@@ -278,9 +270,6 @@ class SearchActivity : AppCompatActivity() {
        // lblMin.changeTextPrimaryColor()
        // lblMax.changeTextPrimaryColor()
        // ivClose.changeBackgroundImageTint(getPrimaryColor())
-
-
-
 
         val max = 500f
         rangebar?.valueTo = max
@@ -307,7 +296,6 @@ class SearchActivity : AppCompatActivity() {
             "popularity"->toggleorderby?.check(R.id.popular)
             "rating"->toggleorderby?.check(R.id.mostrate)
         }
-
 
         toggleorderby?.addOnButtonCheckedListener { _, checkedId, isChecked ->
             if (isChecked)
@@ -354,13 +342,8 @@ class SearchActivity : AppCompatActivity() {
             when(checkedId){
                 R.id.des-> productFilter.setOrder(Sort.DESCENDING)
                 R.id.asc-> productFilter.setOrder(Sort.ASCENDING)
-
             }
         }
-
-
-
-
 
         tvApply?.setOnClickListener {
             mPage=1

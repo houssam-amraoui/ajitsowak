@@ -85,7 +85,7 @@
     <string name="lbl_invite_now">Invite Now</string>
     <string name="lbl_your_rewards">Your Rewards</string>
     <string name="lbl_submit">Submit</string>
-    <string name="lbl_remove_cart">Remove cartModel</string>
+    <string name="lbl_remove_cart">Remove from cart</string>
     <string name="lbl_logout_confirmation">Are you want to logout?</string>
     <string name="lbl_dialog_title">Confirmation</string>
     <string name="lbl_yes">YES</string>

@@ -1,13 +1,17 @@
 package ma.pam.ajitsowak.utils
 
+import android.app.Activity
 import android.app.Dialog
 import android.graphics.drawable.ColorDrawable
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import com.google.android.material.snackbar.Snackbar
 import ma.pam.ajitsowak.R
 import ma.pam.ajitsowak.ui.fragment.WishListFragment
 
@@ -51,39 +55,11 @@ fun AppCompatActivity.setDetailToolbar(mToolbar: Toolbar) {
         onBackPressed()
     }
 
-
     //  mToolbar.changeToolbarFont()
     // mToolbar.navigationIcon!!.setColorFilter(Color.parseColor(getAccentColor()), PorterDuff.Mode.SRC_ATOP)
     // mToolbar.setTitleTextColor(Color.parseColor(getTextTitleColor()))
 }
 
-var progressDialog: Dialog? = null
-
-fun AppCompatActivity.showProgress(show: Boolean) {
-
-    if (progressDialog == null) {
-        Log.d("nihahah", "enit")
-        progressDialog = Dialog(this)
-        progressDialog!!.window!!.setBackgroundDrawable(ColorDrawable(0))
-        progressDialog!!.setContentView(R.layout.custom_dialog)
-        if(getPrimaryColor().isNotEmpty()){
-           // progressDialog!!.tv_progress_msg.changePrimaryColor()
-        }
-    }
-    when {
-        show -> {
-            if (!isFinishing) {
-                progressDialog!!.setCanceledOnTouchOutside(false)
-                progressDialog!!.show()
-            }
-        }
-        else -> try {
-            if (progressDialog!!.isShowing && !isFinishing) {
-                progressDialog!!.dismiss()
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
-}
+fun Activity.snackBar(msg: String, length: Int = Snackbar.LENGTH_SHORT) =
+        Snackbar.make(findViewById(android.R.id.content), msg, length)
+                .setTextColor(ContextCompat.getColor(this,R.color.white)).show()
