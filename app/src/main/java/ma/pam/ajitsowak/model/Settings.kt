@@ -1,5 +1,7 @@
 package ma.pam.ajitsowak.model
 
+import java.io.Serializable
+
 data class Settings(
         var cost: Cost = Cost(),
         var ignore_discounts: IgnoreDiscounts? = null,
@@ -7,4 +9,4 @@ data class Settings(
         var requires: Requires? = null,
         var tax_status: TaxStatus? = null,
         var title: Title? = null
-)
+): Serializable

@@ -1,6 +1,5 @@
 package ma.pam.ajitsowak.woolib.models
 
-import com.fasterxml.jackson.databind.ser.Serializers
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 

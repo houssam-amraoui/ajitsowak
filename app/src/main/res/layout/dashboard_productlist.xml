@@ -16,7 +16,9 @@
         <TextView
             android:id="@+id/tvTitleBar"
             style="@style/Heading"
-            android:text="@string/lbl_newest_product" />
+            android:text="@string/lbl_newest_product"
+            android:textStyle="bold"
+            />
 
         <TextView
             android:id="@+id/viewAllItem"
@@ -32,7 +34,8 @@
             android:textAppearance="@style/FontSemiBold"
             android:textColor="@color/textColorSecondary"
             android:textSize="@dimen/font_size_small"
-            tools:ignore="RelativeOverlap" />
+            tools:ignore="RelativeOverlap"
+            android:textStyle="bold"/>
 
     </RelativeLayout>
 

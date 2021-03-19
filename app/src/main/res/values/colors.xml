@@ -6,11 +6,12 @@
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
 
-<color name="colorPrimary">#ff9c71</color>
-<color name="colorPrimaryDark">@color/colorPrimary</color>
-<color name="colorAccent">#654062</color>
 
-<color name="menuIconColor">@color/colorAccent</color>
+<color name="colorPrimary">#e65238</color>
+<color name="colorPrimaryDark">@color/colorPrimary</color>
+<color name="colorAccent">#ff8464</color>
+
+<color name="menuIconColor">@color/white</color>
 
 <color name="splashBackground">#ffffff</color>
 
@@ -23,7 +24,7 @@
 <color name="view_color">#eaeaea</color>
 <color name="transparent">#00000000</color>
 
-<color name="colorScreenBackground">#F6F7FA</color>
+<color name="colorScreenBackground">#fcfefd</color>
 <!--Drawable Color-->
 <color name="commonDrawableColor">#ffffff</color>
 <color name="colorBackArrow">@color/colorAccent</color>
@@ -39,7 +40,7 @@
 <color name="colorTitleBarText">#ffffff</color>
 
 <color name="editText_background">#F1F1F1</color>
-<color name="tomato">#ff9c71</color>
+<color name="tomato">@color/colorPrimary</color>
 <color name="dots_color">#A5A5A5</color>
 <color name="editText_background_active">#FDE9DA</color>
 <color name="favourite_unselected_background">#ECECEC</color>

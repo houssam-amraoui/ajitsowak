@@ -3,6 +3,7 @@ package ma.pam.ajitsowak.ui.activity
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.ColorFilter
 import android.graphics.PorterDuff
@@ -217,10 +218,14 @@ class ProductDetailActivity1 : mAppCompatActivity() {
         val menuSearchItem: MenuItem = menu.findItem(R.id.action_search)
         menuWishItem.isVisible = true
         menuSearchItem.isVisible = false
+        menuWishItem.actionView.findViewById<ImageView>(R.id.ivCart).setColorFilter(ContextCompat.getColor(this,R.color.colorAccent), PorterDuff.Mode.SRC_IN)
         mMenuCart = menuWishItem.actionView
         menuWishItem.actionView.setOnClickListener {
             startActivity(Intent(this, MyCartActivity::class.java))
         }
+
+
+
         setCartCount()
         return super.onCreateOptionsMenu(menu)
     }

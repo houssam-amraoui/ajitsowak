@@ -1,6 +1,5 @@
 package ma.pam.ajitsowak.woolib.models
 
-import com.fasterxml.jackson.annotation.JsonProperty
 
 class PaymentGatewaySetting {
 
@@ -9,7 +8,6 @@ class PaymentGatewaySetting {
     lateinit var description: String
     lateinit var type: String
     lateinit var value: String
-    @JsonProperty("default")
     lateinit var default_value: String
     lateinit var tip: String
     lateinit var placeholder: String

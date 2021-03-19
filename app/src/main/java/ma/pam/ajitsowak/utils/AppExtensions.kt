@@ -138,7 +138,7 @@ fun Context.fontRegular(): Typeface? {
 }
 
 fun Activity.getAlertDialog(aMsgText: String, aTitleText: String = getString(R.string.lbl_dialog_title), aPositiveText: String = getString(R.string.lbl_yes), aNegativeText: String = getString(R.string.lbl_no), onPositiveClick: (dialog: DialogInterface, Int) -> Unit, onNegativeClick: (dialog: DialogInterface, Int) -> Unit): AlertDialog {
-    val builder = AlertDialog.Builder(this)
+    val builder = AlertDialog.Builder(this,R.style.AlertDialogCustom)
     builder.setTitle(aTitleText)
     builder.setMessage(aMsgText)
     builder.setPositiveButton(aPositiveText) { dialog, which ->

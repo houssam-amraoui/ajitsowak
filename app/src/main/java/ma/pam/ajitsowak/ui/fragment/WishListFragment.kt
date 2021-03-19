@@ -18,6 +18,7 @@ import ma.pam.ajitsowak.room.FavModel
 import ma.pam.ajitsowak.ui.activity.ProductDetailActivity1
 import ma.pam.ajitsowak.utils.*
 import ma.pam.ajitsowak.utils.Constants.KeyIntent.DATA
+import ma.pam.ajitsowak.utils.Constants.KeyIntent.PRODUCT_ID
 import ma.pam.ajitsowak.woolib.models.Product
 import retrofit2.Call
 import retrofit2.Callback
@@ -52,6 +53,7 @@ class WishListFragment : Fragment() {
         }
         view.setOnClickListener {
             startActivity(Intent(activity, ProductDetailActivity1::class.java).apply {
+                putExtra(PRODUCT_ID, model.id)
                 putExtra(DATA, model)
             })
         }

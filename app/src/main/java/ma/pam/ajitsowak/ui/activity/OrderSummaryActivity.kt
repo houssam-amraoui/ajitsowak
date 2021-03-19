@@ -278,7 +278,9 @@ class OrderSummaryActivity : AppCompatActivity() {
                     getCheckoutUrl(order.id,order.order_key)
                 }
 
-                getRoom().Dao().insertOrder(OrderItem(order.id,order.order_key,orderRequest.line_items.first().image))
+                getRoom().Dao().insertOrder(
+                        OrderItem(order.id,order.order_key,orderRequest.line_items.first().image)
+                )
             }
         })
     }

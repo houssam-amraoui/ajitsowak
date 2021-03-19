@@ -1,5 +1,7 @@
 package ma.pam.ajitsowak.model
 
+import java.io.Serializable
+
 data class Requires(
     var default: String?,
     var description: String?,
@@ -10,4 +12,4 @@ data class Requires(
     var tip: String?,
     var type: String?,
     var value: String?
-)
+): Serializable

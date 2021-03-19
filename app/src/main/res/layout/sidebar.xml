@@ -72,7 +72,7 @@
             android:id="@+id/tvCart"
             style="@style/SidebarLabel.SidebarOption"
             android:gravity="center_vertical"
-            android:text="@string/cartModel"
+            android:text="@string/cart"
             app:drawableStartCompat="@drawable/ic_shopping_cart" />
 
         <TextView

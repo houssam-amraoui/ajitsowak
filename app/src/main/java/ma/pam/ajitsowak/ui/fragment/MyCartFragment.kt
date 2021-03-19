@@ -216,7 +216,7 @@ class MyCartFragment : Fragment() {
                     putExtra(DISCOUNT, mTotalDiscount)
                     putExtra(SHIPPING, mShippingCost)
                 }
-                startActivity(intent)
+                startActivityForResult(intent,Constants.RequestCode.ORDER_SUMMARY)
 
             } else {
                 Toast.makeText(context, "You do not provided shipping address.", Toast.LENGTH_SHORT).show()
@@ -312,6 +312,7 @@ class MyCartFragment : Fragment() {
 
     private fun removeMultipleCartItem() {
         getRoom().Dao().DeleteAllCart()
+        getSharedPrefInstance().setValue(Constants.SharedPref.KEY_CART_COUNT, 0)
         activity!!.finish()
     }
 
@@ -450,6 +451,7 @@ class MyCartFragment : Fragment() {
 
 
             shippingMethods.clear()
+            shippingMethods.add(sh)
             shippingMethods.add(sh1)
             shippingMethods.add(sh2)
             invalidateShippingMethods()

@@ -71,26 +71,26 @@ class HomeFragment1 : Fragment() {
         //view.findViewById<TextView>(R.id.tvProductName).changeTextPrimaryColor()
 
         if (!model.isOn_sale) {
-            view.findViewById<TextView>(R.id.tvDiscountPrice).text = model.price.plus(" MAD")
-            view.findViewById<TextView>(R.id.tvOriginalPrice).visibility = View.VISIBLE
-            view.findViewById<TextView>(R.id.tvSaleLabel).visibility = View.GONE
+            view.findViewById<TextView>(R.id.tvDiscountPrice).text = model.price.currencyFormat()
+            view.findViewById<TextView>(R.id.tvOriginalPrice).visibility = VISIBLE
+            view.findViewById<TextView>(R.id.tvSaleLabel).visibility = GONE
             view.findViewById<TextView>(R.id.tvOriginalPrice).text = ""
         } else {
             if (model.sale_price.isNotEmpty()) {
-                view.findViewById<TextView>(R.id.tvSaleLabel).visibility = View.VISIBLE
-                view.findViewById<TextView>(R.id.tvDiscountPrice).text = model.sale_price.plus(" MAD")
+                view.findViewById<TextView>(R.id.tvSaleLabel).visibility = VISIBLE
+                view.findViewById<TextView>(R.id.tvDiscountPrice).text = model.sale_price.currencyFormat()
                 view.findViewById<TextView>(R.id.tvOriginalPrice).applyStrike()
-                view.findViewById<TextView>(R.id.tvOriginalPrice).text = model.regular_price.plus(" MAD")
-                view.findViewById<TextView>(R.id.tvOriginalPrice).visibility = View.VISIBLE
+                view.findViewById<TextView>(R.id.tvOriginalPrice).text = model.regular_price.currencyFormat()
+                view.findViewById<TextView>(R.id.tvOriginalPrice).visibility = VISIBLE
             } else {
-                view.findViewById<TextView>(R.id.tvSaleLabel).visibility = View.GONE
-                view.findViewById<TextView>(R.id.tvOriginalPrice).visibility = View.VISIBLE
+                view.findViewById<TextView>(R.id.tvSaleLabel).visibility = GONE
+                view.findViewById<TextView>(R.id.tvOriginalPrice).visibility = VISIBLE
                 if (model.regular_price.isEmpty()) {
                     view.findViewById<TextView>(R.id.tvOriginalPrice).text = ""
-                    view.findViewById<TextView>(R.id.tvDiscountPrice).text = model.price.plus(" MAD")
+                    view.findViewById<TextView>(R.id.tvDiscountPrice).text = model.price.currencyFormat()
                 } else {
                     view.findViewById<TextView>(R.id.tvOriginalPrice).text = ""
-                    view.findViewById<TextView>(R.id.tvDiscountPrice).text = model.regular_price.plus(" MAD")
+                    view.findViewById<TextView>(R.id.tvDiscountPrice).text = model.regular_price.currencyFormat()
                 }
             }
         }
@@ -112,15 +112,12 @@ class HomeFragment1 : Fragment() {
             view.findViewById<TextView>(R.id.tvAdd).show()
         }
 
-
         view.setOnClickListener {
 
             startActivity(Intent(activity, ProductDetailActivity1::class.java).apply {
                 putExtra(Constants.KeyIntent.PRODUCT_ID, model.id)
                 putExtra(Constants.KeyIntent.DATA, model)
             })
-
-
             }
 
         view.findViewById<TextView>(R.id.tvAdd).setOnClickListener {

@@ -14,7 +14,6 @@
 
     <string name="lbl_sign_in">Sign In</string>
     <string name="lbl_sign_up">Sign Up</string>
-    <string name="lbl_enter_the_code_nto_verify_email">Enter the Code to Verify Your Email</string>
     <string name="lbl_we_have_sent_you_mail_with_verification_code_to">We have sent you mail with verification code to-</string>
     <string name="lbl_tep_email">jonndeo@gmail.com</string>
     <string name="lbl_did_not_receive">Did not receive?</string>
@@ -85,7 +84,7 @@
     <string name="lbl_invite_now">Invite Now</string>
     <string name="lbl_your_rewards">Your Rewards</string>
     <string name="lbl_submit">Submit</string>
-    <string name="lbl_remove_cart">Remove from cart</string>
+    <string name="lbl_remove_cart">Remove cart</string>
     <string name="lbl_logout_confirmation">Are you want to logout?</string>
     <string name="lbl_dialog_title">Confirmation</string>
     <string name="lbl_yes">YES</string>
@@ -102,7 +101,7 @@
     <string name="error_permission_required">Location Permission Required</string>
     <string name="error_address_type">Please Select Address Type</string>
     <string name="hint_email">Email</string>
-    <string name="hint_company">Company (optional)</string>
+    <string name="hint_company">Company</string>
     <string name="hint_add1">Address 1</string>
     <string name="hint_add2">Address 2</string>
     <string name="hint_password">Password</string>
@@ -116,6 +115,7 @@
     <string name="hint_pin_code">Pin code</string>
     <string name="hint_mobile_no">Phone number</string>
     <string name="text_todo">TODO</string>
+    <string name="text_juliane_deerman">Juliane Deerman</string>
     <string name="text__02">00</string>
     <string name="text__10">00</string>
     <string name="text_499">$49</string>
@@ -130,7 +130,7 @@
     <string name="action_filter">Filter</string>
     <string name="menu_my_cart">My Cart</string>
     <string name="home">Home</string>
-    <string name="cartModel">My Cart</string>
+    <string name="cart">My Cart</string>
     <string name="more">Read More</string>
     <string name="less">Read Less</string>
     <string name="order_summary">Order Summary</string>
@@ -185,7 +185,7 @@
     <string name="lbl_loading">Loading</string>
     <string name="hint_review">Review</string>
     <string name="lbl_0">$0</string>
-    <string name="err_empty_cart">No items in your cartModel</string>
+    <string name="err_empty_cart">No items in your cart</string>
     <string name="lbl_shop_now">Shop Now</string>
     <string name="lbl_select_address_type">Select Address Type</string>
     <string name="app_id">ca-app-pub-3940256099942544~3347511713</string>
@@ -315,7 +315,6 @@
     <string name="lbl_change_your_pwd">Change your password</string>
     <string name="lbl_light_mode">Light Mode</string>
 
-
     <string-array name="qty_array">
         <item>1</item>
         <item>2</item>
@@ -333,8 +332,9 @@
         <item>Indonesian</item>
         <item>Afrikaans</item>
         <item>Portuguese</item>
+        <item>Turkish</item>
         <item>Arabic</item>
-
+        <item>Vietnamese</item>
     </string-array>
 
     <string name="order_cancel_1">Product is being delivered to a wrong address</string>
@@ -363,4 +363,5 @@
 
     <string name="facebook_app_id" translatable="false"> 519323575384019</string>
     <string name="fb_login_protocol_scheme" translatable="false">fb519323575384019</string>
+
 </resources>

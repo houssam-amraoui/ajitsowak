@@ -1,5 +1,7 @@
 package ma.pam.ajitsowak.model
 
+import java.io.Serializable
+
 data class MinAmount(
     var default: String?,
     var description: String?,
@@ -9,4 +11,4 @@ data class MinAmount(
     var tip: String?,
     var type: String?,
     var value: String?
-)
+): Serializable

@@ -20,19 +20,23 @@
             android:layout_centerInParent="true"
             android:text="@string/lbl_deals_of_the_day"
             android:textAppearance="@style/FontBold"
-            android:textColor="@color/colorAccent"
+            android:textColor="@color/white"
             android:textSize="@dimen/font_size_large" />
 
 
         <TextView
             android:id="@+id/viewAllItem"
-            style="@style/MaterialButtonStyle.FilledLight"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:text="@string/lbl_view_all"
             android:textSize="@dimen/font_size_small"
-            app:cornerRadius="@dimen/spacing_control" />
+            android:backgroundTint="@color/colorAccent"
+            android:background="@drawable/bg_button_add"
+            android:textColor="@color/white"
+
+            android:padding="8dp"
+            />
 
     </RelativeLayout>
 

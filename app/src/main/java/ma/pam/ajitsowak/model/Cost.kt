@@ -1,5 +1,7 @@
 package ma.pam.ajitsowak.model
 
+import java.io.Serializable
+
 data class Cost(
     var default: String? = null,
     var description: String? = null,
@@ -9,4 +11,4 @@ data class Cost(
     var tip: String? = null,
     var type: String? = null,
     var value: String = "0"
-)
+): Serializable
